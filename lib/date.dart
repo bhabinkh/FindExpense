@@ -267,9 +267,7 @@ class _YearWidgetContainerState extends State<YearWidgetContainer> {
             icon: Icon(Icons.arrow_forward_ios),
             color: Colors.black,
             onPressed: () {
-              setState(() {
-                _date.add(Duration(days: 365));
-              });
+              setState(() {}); //Hi all
             }),
       ),
     ));
