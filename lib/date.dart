@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'month_picker.dart';
 
 var dateWidgetContainer = DateWidgetContainer();
 var monthWidgetContainer = MonthWidgetContainer();
-var yearWidgetContainer = YearWidgetContainer();
 
 class DateWidgetContainer extends StatefulWidget {
   @override
@@ -11,6 +11,24 @@ class DateWidgetContainer extends StatefulWidget {
 }
 
 class _DateWidgetContainerState extends State<DateWidgetContainer> {
+  DateTime _date = DateTime.now();
+
+  Future<Null> _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+      context: context,
+      initialDate: _date,
+      firstDate: DateTime(2018),
+      lastDate: DateTime(2030),
+    );
+
+    if (picked != null && picked != _date) {
+      // print('Date Selected: ${_date.toString()}');
+      setState(() {
+        _date = picked;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -24,20 +42,31 @@ class _DateWidgetContainerState extends State<DateWidgetContainer> {
 
   dateWidgetContainer(context) {
     return Container(
-        child: Card(
-      color: Colors.green,
-      child: ListTile(
-        leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios),
-            color: Colors.black,
-            onPressed: () {}),
-        title: dateContainer(context),
-        trailing: IconButton(
-            icon: Icon(Icons.arrow_forward_ios),
-            color: Colors.black,
-            onPressed: () {}),
+      child: Card(
+        color: Colors.red,
+        child: Container(
+          padding: EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              IconButton(
+                  icon: Icon(Icons.keyboard_arrow_left),
+                  color: Colors.white,
+                  onPressed: () {
+                    _selectDate(context);
+                  }),
+              dateContainer(context),
+              IconButton(
+                  icon: Icon(Icons.keyboard_arrow_right),
+                  color: Colors.white,
+                  onPressed: () {
+                    _selectDate(context);
+                  }),
+            ],
+          ),
+        ),
       ),
-    ));
+    );
   }
 
   dateContainer(context) {
@@ -116,24 +145,6 @@ class _DateWidgetContainerState extends State<DateWidgetContainer> {
     else
       return "Sunday";
   }
-
-  DateTime _date = DateTime.now();
-
-  Future<Null> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-      context: context,
-      initialDate: _date,
-      firstDate: DateTime(2018),
-      lastDate: DateTime(2030),
-    );
-
-    if (picked != null && picked != _date) {
-      // print('Date Selected: ${_date.toString()}');
-      setState(() {
-        _date = picked;
-      });
-    }
-  }
 }
 
 class MonthWidgetContainer extends StatefulWidget {
@@ -142,6 +153,22 @@ class MonthWidgetContainer extends StatefulWidget {
 }
 
 class _MonthWidgetContainerState extends State<MonthWidgetContainer> {
+  DateTime _date = DateTime.now();
+
+  Future<Null> _selectDate(BuildContext context) async {
+    final DateTime picked = await showMonthPicker(
+      context: context,
+      initialDate: _date,
+    );
+
+    if (picked != null && picked != _date) {
+      print('Date Selected: ${_date.toString()}');
+      setState(() {
+        _date = picked;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -156,17 +183,27 @@ class _MonthWidgetContainerState extends State<MonthWidgetContainer> {
   monthWidgetContainer(context) {
     return Container(
         child: Card(
-      color: Colors.green,
-      child: ListTile(
-        leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios),
-            color: Colors.black,
-            onPressed: () {}),
-        title: dateContainer(context),
-        trailing: IconButton(
-            icon: Icon(Icons.arrow_forward_ios),
-            color: Colors.black,
-            onPressed: () {}),
+      color: Colors.red,
+      child: Container(
+        padding: EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            IconButton(
+                icon: Icon(Icons.keyboard_arrow_left),
+                color: Colors.white,
+                onPressed: () {
+                  _selectDate(context);
+                }),
+            dateContainer(context),
+            IconButton(
+                icon: Icon(Icons.keyboard_arrow_right),
+                color: Colors.white,
+                onPressed: () {
+                  _selectDate(context);
+                }),
+          ],
+        ),
       ),
     ));
   }
@@ -176,11 +213,7 @@ class _MonthWidgetContainerState extends State<MonthWidgetContainer> {
       child: FlatButton(
         child: Row(
           children: <Widget>[
-            Padding(padding: EdgeInsets.only(left: 12.0)),
-            Center(
-              child:
-                  Text(month() + "  " + "${_date.year}", textScaleFactor: 1.6),
-            ),
+            Text(month() + "  " + "${_date.year}", textScaleFactor: 1.6),
           ],
         ),
         onPressed: () {
@@ -215,100 +248,5 @@ class _MonthWidgetContainerState extends State<MonthWidgetContainer> {
       return "November";
     else
       return "December";
-  }
-
-  DateTime _date = DateTime.now();
-
-  Future<Null> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-      context: context,
-      initialDate: _date,
-      firstDate: DateTime(2018),
-      lastDate: DateTime(2030),
-    );
-
-    if (picked != null && picked != _date) {
-      // print('Date Selected: ${_date.toString()}');
-      setState(() {
-        _date = picked;
-      });
-    }
-  }
-}
-
-class YearWidgetContainer extends StatefulWidget {
-  @override
-  _YearWidgetContainerState createState() => _YearWidgetContainerState();
-}
-
-class _YearWidgetContainerState extends State<YearWidgetContainer> {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: <Widget>[
-          yearWidgetContainer(context),
-        ],
-      ),
-    );
-  }
-
-  yearWidgetContainer(context) {
-    return Container(
-        child: Card(
-      color: Colors.green,
-      child: ListTile(
-        leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios),
-            color: Colors.black,
-            onPressed: () {}),
-        title: dateContainer(context),
-        trailing: IconButton(
-            icon: Icon(Icons.arrow_forward_ios),
-            color: Colors.black,
-            onPressed: () {
-              setState(() {}); //Hi all
-            }),
-      ),
-    ));
-  }
-
-  dateContainer(context) {
-    return Container(
-      child: FlatButton(
-        child: Row(
-          children: <Widget>[
-            Padding(padding: EdgeInsets.only(left: 12.0)),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text("${_date.year}", textScaleFactor: 1.6),
-              ],
-            ),
-          ],
-        ),
-        onPressed: () {
-          _selectDate(context);
-        },
-      ),
-    );
-  }
-
-  DateTime _date = DateTime.now();
-
-  Future<Null> _selectDate(BuildContext context) async {
-    final DateTime picked = await showDatePicker(
-      context: context,
-      initialDate: _date,
-      firstDate: DateTime(2018),
-      lastDate: DateTime(2030),
-    );
-
-    if (picked != null && picked != _date) {
-      // print('Date Selected: ${_date.toString()}');
-      setState(() {
-        _date = picked;
-      });
-    }
   }
 }
