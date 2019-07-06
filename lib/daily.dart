@@ -12,9 +12,9 @@ class _DailyState extends State<Daily> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Column(
+      child: Stack(
         children: <Widget>[
-          dateWidgetContainer,
+          DateWidgetContainer(),
         ],
       ),
     );

@@ -42,7 +42,7 @@ class HomePage extends StatelessWidget {
           children: <Widget>[
             Daily(),
             Monthly(),
-            Todo(),
+            TodoWidget(),
             // yearly,
           ],
         ),

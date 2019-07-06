@@ -2,29 +2,30 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'month_picker.dart';
 
-var dateWidgetContainer = DateWidgetContainer();
 var monthWidgetContainer = MonthWidgetContainer();
 
 class DateWidgetContainer extends StatefulWidget {
+  DateTime _date = DateTime.now();
+
   @override
   _DateWidgetContainerState createState() => _DateWidgetContainerState();
 }
 
 class _DateWidgetContainerState extends State<DateWidgetContainer> {
-  DateTime _date = DateTime.now();
+
 
   Future<Null> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
       context: context,
-      initialDate: _date,
+      initialDate: widget._date,
       firstDate: DateTime(2018),
       lastDate: DateTime(2030),
     );
 
-    if (picked != null && picked != _date) {
+    if (picked != null && picked != widget._date) {
       // print('Date Selected: ${_date.toString()}');
       setState(() {
-        _date = picked;
+        widget._date = picked;
       });
     }
   }
@@ -46,24 +47,7 @@ class _DateWidgetContainerState extends State<DateWidgetContainer> {
         color: Colors.red,
         child: Container(
           padding: EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              IconButton(
-                  icon: Icon(Icons.keyboard_arrow_left),
-                  color: Colors.white,
-                  onPressed: () {
-                    _selectDate(context);
-                  }),
-              dateContainer(context),
-              IconButton(
-                  icon: Icon(Icons.keyboard_arrow_right),
-                  color: Colors.white,
-                  onPressed: () {
-                    _selectDate(context);
-                  }),
-            ],
-          ),
+          child: dateContainer(context),
         ),
       ),
     );
@@ -74,15 +58,21 @@ class _DateWidgetContainerState extends State<DateWidgetContainer> {
       child: FlatButton(
         child: Row(
           children: <Widget>[
-            Text(day(), textScaleFactor: 2.6),
+            Text(
+              day(),
+              textScaleFactor: 2.6,
+              style: TextStyle(color: Colors.white),
+            ),
             Padding(padding: EdgeInsets.only(left: 12.0)),
             Column(
               children: <Widget>[
                 Text(
-                  month() + "  " + "${_date.year}",
+                  month() + "  " + "${widget._date.year}",
+                  style: TextStyle(color: Colors.white),
                 ),
                 Text(
                   weekDay(),
+                  style: TextStyle(color: Colors.white),
                 )
               ],
             ),
@@ -96,51 +86,51 @@ class _DateWidgetContainerState extends State<DateWidgetContainer> {
   }
 
   day() {
-    if (_date.day.toString().length == 1)
-      return "0${_date.day}";
+    if (widget._date.day.toString().length == 1)
+      return "0${widget._date.day}";
     else
-      return "${_date.day}";
+      return "${widget._date.day}";
   }
 
   month() {
-    if (_date.month == 1)
+    if (widget._date.month == 1)
       return "January";
-    else if (_date.month == 2)
+    else if (widget._date.month == 2)
       return "February";
-    else if (_date.month == 3)
+    else if (widget._date.month == 3)
       return "March";
-    else if (_date.month == 4)
+    else if (widget._date.month == 4)
       return "April";
-    else if (_date.month == 5)
+    else if (widget._date.month == 5)
       return "May";
-    else if (_date.month == 6)
+    else if (widget._date.month == 6)
       return "June";
-    else if (_date.month == 7)
+    else if (widget._date.month == 7)
       return "July";
-    else if (_date.month == 8)
+    else if (widget._date.month == 8)
       return "August";
-    else if (_date.month == 9)
+    else if (widget._date.month == 9)
       return "September";
-    else if (_date.month == 10)
+    else if (widget._date.month == 10)
       return "October";
-    else if (_date.month == 11)
+    else if (widget._date.month == 11)
       return "November";
     else
       return "December";
   }
 
   weekDay() {
-    if (_date.weekday == 1)
+    if (widget._date.weekday == 1)
       return "Monday";
-    else if (_date.weekday == 2)
+    else if (widget._date.weekday == 2)
       return "Tuesday";
-    else if (_date.weekday == 3)
+    else if (widget._date.weekday == 3)
       return "Wednesday";
-    else if (_date.weekday == 4)
+    else if (widget._date.weekday == 4)
       return "Thursday";
-    else if (_date.weekday == 5)
+    else if (widget._date.weekday == 5)
       return "Friday";
-    else if (_date.weekday == 6)
+    else if (widget._date.weekday == 6)
       return "Saturday";
     else
       return "Sunday";
@@ -213,7 +203,11 @@ class _MonthWidgetContainerState extends State<MonthWidgetContainer> {
       child: FlatButton(
         child: Row(
           children: <Widget>[
-            Text(month() + "  " + "${_date.year}", textScaleFactor: 1.6),
+            Text(
+              month() + "  " + "${_date.year}",
+              textScaleFactor: 1.6,
+              style: TextStyle(color: Colors.white),
+            ),
           ],
         ),
         onPressed: () {
