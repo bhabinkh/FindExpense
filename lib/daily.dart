@@ -189,7 +189,7 @@ class _ListItemWidget extends StatelessWidget {
     return ListView.builder(
       shrinkWrap: true,
       physics: ClampingScrollPhysics(),
-      itemCount: 15 + 1,
+      itemCount: 10 + 1,
       itemBuilder: (BuildContext context, int index) {
         if (index == 0) {
           return Container(
@@ -199,7 +199,7 @@ class _ListItemWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisSize: MainAxisSize.max,
-              children: <Widget>[Text('Total $hint'), Text(1200.toString())],
+              children: <Widget>[Text('Total $hint'), Text(40000.toString())],
             ),
           );
         }
@@ -208,7 +208,7 @@ class _ListItemWidget extends StatelessWidget {
           child: _ItemWidget(
             name: 'Food',
             price: 2000,
-            icon: (index % 2 == 0) ? null : Icons.near_me,
+            icon: Icons.near_me,
           ),
         );
       },
