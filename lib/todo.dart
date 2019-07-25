@@ -1,5 +1,4 @@
 import 'package:find_expense/TodoItemWidget.dart';
-import 'package:find_expense/daos/TodoDao.dart';
 import 'package:find_expense/database/database.dart';
 import 'package:find_expense/models/todo.dart';
 import 'package:flutter/material.dart';

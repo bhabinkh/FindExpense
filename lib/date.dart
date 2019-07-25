@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'Services/Service.dart';
 import 'month_picker.dart';
 
 var monthWidgetContainer = MonthWidgetContainer();
 
 class DateWidgetContainer extends StatefulWidget {
   DateTime _date = DateTime.now();
+  Function callBack;
+
+  DateWidgetContainer(this.callBack, this._date);
 
   @override
   _DateWidgetContainerState createState() => _DateWidgetContainerState();
 }
 
 class _DateWidgetContainerState extends State<DateWidgetContainer> {
-
-
   Future<Null> _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
       context: context,
@@ -26,8 +28,23 @@ class _DateWidgetContainerState extends State<DateWidgetContainer> {
       // print('Date Selected: ${_date.toString()}');
       setState(() {
         widget._date = picked;
+        dateInternal = picked;
       });
     }
+
+    Service().savePickedDate(picked).then((value) {
+      widget.callBack();
+    });
+  }
+
+  DateTime dateInternal;
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      dateInternal = widget._date;
+    });
   }
 
   @override
@@ -59,7 +76,7 @@ class _DateWidgetContainerState extends State<DateWidgetContainer> {
         child: Row(
           children: <Widget>[
             Text(
-              day(),
+              widget._date.day.toString(),
               textScaleFactor: 2.6,
               style: TextStyle(color: Colors.white),
             ),

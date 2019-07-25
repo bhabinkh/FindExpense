@@ -39,7 +39,6 @@ class Expense {
 
   @override
   String toString() {
-    // TODO: implement toString
     return '{id: $id, name: $name, cost: $cost, day: $day,month: $month, year: $year}';
   }
 }

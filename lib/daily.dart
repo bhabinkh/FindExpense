@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'Services/Service.dart';
+import 'database/database.dart';
 import 'date.dart';
+import 'models/expense_saving.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 var daily = Daily();
 
@@ -10,86 +16,185 @@ class Daily extends StatefulWidget {
 
 class _DailyState extends State<Daily> {
   bool _add = false;
+  DateTime pickedDate = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: <Widget>[
-        ListView(
-          children: <Widget>[
-            DateWidgetContainer(),
-            _ListItemWidget(hint: 'Saving'),
-            SizedBox(height: 4),
-            _ListItemWidget(hint: 'Expense'),
-          ],
-        ),
-        Positioned(
-          top: 20,
-          right: 20,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget>[
-              Text('Savings', style: TextStyle(color: Colors.white)),
-              Text('+' + 2000.toString(),
-                  style: TextStyle(color: Colors.white)),
-            ],
-          ),
-        ),
-        Positioned(
-          bottom: 15,
-          right: 15,
-          child: Container(
-            height: 48,
-            width: 48,
-            child: _add
-                ? Container()
-                : FloatingActionButton(
-                    onPressed: () {
-                      setState(() {
-                        _add = true;
-                      });
-                    },
-                    child: Icon(Icons.add, size: 36),
+    Function updateOnDateSelectFunction = () {
+      setState(() {});
+    };
+
+    return FutureBuilder(
+      future: Service().getPickedDate(),
+      builder: (BuildContext context, AsyncSnapshot<DateTime> snapshot) {
+        DateTime _date = DateTime.now();
+        if (snapshot.hasData) {
+          _date = snapshot.data;
+        }
+
+        Function callBack = (bool expenseForm, var data) {
+          if (expenseForm) {
+            Provider.of<AppDatabase>(context).expenseDao.insertExpense(
+                  Expense.noId(
+                    data['text'],
+                    data['price'],
+                    _date.day,
+                    _date.month,
+                    _date.year,
                   ),
-          ),
-        ),
-        _add
-            ? Positioned(
-                bottom: 4,
-                width: MediaQuery.of(context).size.width,
-                child: Stack(
-                  children: <Widget>[
-                    Card(
-                      elevation: 6,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 16.0, horizontal: 8),
-                        child: _AddForm(),
-                      ),
-                    ),
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      child: IconButton(
+                );
+          } else {
+            Provider.of<AppDatabase>(context).savingDao.insertSaving(
+                  Saving.noId(
+                    data['text'],
+                    data['price'],
+                    _date.day,
+                    _date.month,
+                    _date.year,
+                  ),
+                );
+          }
+          setState(() {
+            this._add = false;
+          });
+        };
+
+        return Stack(
+          children: <Widget>[
+            ListView(
+              children: <Widget>[
+                DateWidgetContainer(updateOnDateSelectFunction, _date),
+                FutureBuilder(
+                    future: Provider.of<AppDatabase>(context)
+                        .savingDao
+                        .findSavingOnDay(_date.day, _date.month, _date.year),
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      if (snapshot.hasData) {
+                        double _totalSaving = 0;
+                        for (var expense in snapshot.data) {
+                          _totalSaving += expense.cost;
+                        }
+
+                        return _ListItemWidget(
+                          hint: 'Saving',
+                          list: snapshot.data,
+                          totalExpense: _totalSaving,
+                        );
+                      }
+                      return Container(
+                          height: 200,
+                          child: Center(child: CircularProgressIndicator()));
+                    }),
+                SizedBox(height: 4),
+                FutureBuilder(
+                    future: Provider.of<AppDatabase>(context)
+                        .expenseDao
+                        .findExpenseOnDay(_date.day, _date.month, _date.year),
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      if (snapshot.hasData) {
+                        double _totalExpense = 0;
+                        for (var expense in snapshot.data) {
+                          _totalExpense += expense.cost;
+                        }
+
+                        return _ListItemWidget(
+                          hint: 'Expense',
+                          list: snapshot.data,
+                          totalExpense: _totalExpense,
+                        );
+                      }
+                      return Container(
+                          height: 200,
+                          child: Center(child: CircularProgressIndicator()));
+                    }),
+              ],
+            ),
+            Positioned(
+              top: 20,
+              right: 20,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
+                  Text('Savings', style: TextStyle(color: Colors.white)),
+                  FutureBuilder(
+                    future: Service().dailySavingCalculate(_date),
+                    builder:
+                        (BuildContext context, AsyncSnapshot<double> snapshot) {
+                      double _savings = 0;
+                      if (snapshot.hasData) {
+                        _savings = snapshot.data;
+                      }
+                      return Text(
+                          _savings > 0
+                              ? '+' + _savings.toString()
+                              : _savings.toString(),
+                          style: TextStyle(color: Colors.white));
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Positioned(
+              bottom: 15,
+              right: 15,
+              child: Container(
+                height: 48,
+                width: 48,
+                child: _add
+                    ? Container()
+                    : FloatingActionButton(
                         onPressed: () {
                           setState(() {
-                            _add = false;
+                            _add = true;
                           });
                         },
-                        icon: Icon(Icons.clear),
+                        child: Icon(Icons.add, size: 36),
                       ),
-                    )
-                  ],
-                ),
-              )
-            : Container()
-      ],
+              ),
+            ),
+            _add
+                ? Positioned(
+                    bottom: 4,
+                    width: MediaQuery.of(context).size.width,
+                    child: Stack(
+                      children: <Widget>[
+                        Card(
+                          elevation: 6,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 16.0, horizontal: 8),
+                            child: _AddForm(callBackOnAdd: callBack),
+                          ),
+                        ),
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _add = false;
+                              });
+                            },
+                            icon: Icon(Icons.clear),
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                : Container()
+          ],
+        );
+      },
     );
   }
 }
 
 class _AddForm extends StatefulWidget {
+  Function callBackOnAdd;
+
+  _AddForm({@required this.callBackOnAdd});
+
   @override
   __AddFormState createState() => __AddFormState();
 }
@@ -165,7 +270,12 @@ class __AddFormState extends State<_AddForm> {
                 ),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  widget.callBackOnAdd(_expenseForm, {
+                    'text': textController.text,
+                    'price': double.parse(priceController.text),
+                  });
+                },
                 icon: Icon(Icons.check_circle_outline, size: 32),
                 color: Colors.red,
               )
@@ -177,19 +287,24 @@ class __AddFormState extends State<_AddForm> {
   }
 }
 
-class _ListItemWidget extends StatelessWidget {
+class _ListItemWidget extends StatefulWidget {
   List<dynamic> list;
   String hint;
+  double totalExpense;
 
-  _ListItemWidget({this.hint, this.list});
+  _ListItemWidget({this.hint, this.list, this.totalExpense});
 
   @override
+  __ListItemWidgetState createState() => __ListItemWidgetState();
+}
+
+class __ListItemWidgetState extends State<_ListItemWidget> {
+  @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return ListView.builder(
       shrinkWrap: true,
       physics: ClampingScrollPhysics(),
-      itemCount: 10 + 1,
+      itemCount: widget.list.length + 1,
       itemBuilder: (BuildContext context, int index) {
         if (index == 0) {
           return Container(
@@ -199,15 +314,18 @@ class _ListItemWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisSize: MainAxisSize.max,
-              children: <Widget>[Text('Total $hint'), Text(40000.toString())],
+              children: <Widget>[
+                Text('Total ${widget.hint}'),
+                Text(widget.totalExpense.toString())
+              ],
             ),
           );
         }
         return InkWell(
           onLongPress: () {},
           child: _ItemWidget(
-            name: 'Food',
-            price: 2000,
+            name: widget.list[index - 1].name,
+            price: (widget.list[index - 1].cost),
             icon: Icons.near_me,
           ),
         );

@@ -9,9 +9,9 @@ import 'package:find_expense/models/todo.dart';
 
 part 'database.g.dart'; // the generated code will be there
 
-@Database(version: 1, entities: [Todo])
+@Database(version: 1, entities: [Todo, Expense, Saving])
 abstract class AppDatabase extends FloorDatabase {
   TodoDao get todoDao;
-//  ExpenseDao get expenseDao;
-//  SavingDao get savingDao;
+  ExpenseDao get expenseDao;
+  SavingDao get savingDao;
 }

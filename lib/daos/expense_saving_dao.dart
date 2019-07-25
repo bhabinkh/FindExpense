@@ -3,11 +3,12 @@ import 'package:floor/floor.dart';
 
 @dao
 abstract class ExpenseDao {
-  @Query('SELECT * FROM Expense where day = :day')
-  Future<List<Expense>> findExpenseOnDay(int day);
+  @Query(
+      'SELECT * FROM Expense where day = :day AND month = :month AND year = :year')
+  Future<List<Expense>> findExpenseOnDay(int day, int month, int year);
 
-  @Query('SELECT * FROM Expense where month = :month')
-  Future<List<Expense>> findExpenseOnMonth(int month);
+  @Query('SELECT * FROM Expense where month = :month AND year = :year')
+  Future<List<Expense>> findExpenseOnMonth(int month, int year);
 
   @insert
   Future<void> insertExpense(Expense expense);
@@ -21,11 +22,12 @@ abstract class ExpenseDao {
 
 @dao
 abstract class SavingDao {
-  @Query('SELECT * FROM Saving where day = :day')
-  Future<List<Saving>> findSavingOnDay(int day);
+  @Query(
+      'SELECT * FROM Saving where day = :day AND month = :month AND year = :year')
+  Future<List<Saving>> findSavingOnDay(int day, int month, int year);
 
-  @Query('SELECT * FROM Saving where month = :month')
-  Future<List<Saving>> findSavingOnMonth(int month);
+  @Query('SELECT * FROM Saving where month = :month AND year = :year')
+  Future<List<Saving>> findSavingOnMonth(int month, int year);
 
   @insert
   Future<void> insertSaving(Saving saving);
